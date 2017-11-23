@@ -1,6 +1,5 @@
-leetcode
+learning
 ========
 
-my code for leetcode
+my code during learning
 and more
-Here is my code for leetcode.
