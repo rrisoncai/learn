@@ -1,5 +1,4 @@
 learning
 ========
 
-my code during learning
-and more
+my code during learning.
