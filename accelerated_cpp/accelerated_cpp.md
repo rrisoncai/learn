@@ -23,4 +23,5 @@ it is a good idea for the #ifndef to be the first line of file, some C++ impleme
 **vector** fast random access.  
 **list** for fast insertion and deletion.  
 It's not easy to pass an overloaded function directly as an argument to a template function.  
-
+Local variable declared to be **static** is preserved across invocation of the function.  
+**remove_if** move elements to new position in the container.  
