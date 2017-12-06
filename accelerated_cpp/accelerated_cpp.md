@@ -37,5 +37,6 @@ typedef double (*fp)(int);
 fp get_fp();
 ```
 C++ differs from C in requiring a zero request to return a non-null pointer.  
-
+constructor control initialization; operator= control assignment.  
+**new** is expensive: allocate memory and initialize memory.  
 
