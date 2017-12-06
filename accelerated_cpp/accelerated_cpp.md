@@ -25,3 +25,17 @@ it is a good idea for the #ifndef to be the first line of file, some C++ impleme
 It's not easy to pass an overloaded function directly as an argument to a template function.  
 Local variable declared to be **static** is preserved across invocation of the function.  
 **remove_if** move elements to new position in the container.  
+**map** will initialize value.  
+template instantiate at link time.  
+input iterator, output iterator, forward iterator, bidirectional iterator, random access  
+Why range is [,): 1. treat last element; 2.treat empty range. 3. only != is needed.  
+**const member function**: int grade() const; will not change the state of object.  
+**class** private member by default; **struct** public member by default.  
+function pointer as return type:
+```cpp
+typedef double (*fp)(int);
+fp get_fp();
+```
+C++ differs from C in requiring a zero request to return a non-null pointer.  
+
+
