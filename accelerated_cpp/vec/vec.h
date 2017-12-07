@@ -22,14 +22,15 @@ template <class T> class Vec
         Vec& operator=(const Vec&);
         iterator begin() {return data; }
         const_iterator begin() const { return data; }
-        iterator end() { return limit; }
-        const_iterator end() const { return limit; }
+        iterator end() { return avail; }
+        const_iterator end() const { return avail; }
         void push_back(const T& val)
         {
             if(avail == limit)
                 grow();
             unchecked_append(val);
         }
+        bool empty() const { return data == avail; }
 
     private:
         iterator data;
