@@ -1,3 +1,0 @@
-/home/xd/Downloads/test_opencv/CMakeFiles/edit_cache.dir
-/home/xd/Downloads/test_opencv/CMakeFiles/rebuild_cache.dir
-/home/xd/Downloads/test_opencv/CMakeFiles/opencv_example.dir
