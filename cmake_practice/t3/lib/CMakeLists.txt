@@ -1,0 +1,3 @@
+SET(LIBHELLO_SRC hello.c)
+ADD_LIBRARY(hello SHARED ${LIBHELLO_SRC})
+add_library(hello STATIC ${LIBHELLO_SRC})

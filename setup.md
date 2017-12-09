@@ -11,7 +11,7 @@ wget http://mirrors.ustc.edu.cn/qtproject/archive/qt/5.6/5.6.2/qt-opensource-lin
 sudo ./qt-opensource-linux-x64-5.6.2.run
 chmod +x qt-opensource-linux-x64-5.6.2.run
 ## set library path in .bashrc
-export LD_LIBRARY_PATH="/home/xd/Qt5.6.2/5.6/gcc_64/lib/:LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="/home/xd/Qt5.6.2/5.6/gcc_64/lib/:$LD_LIBRARY_PATH"
 export QT_PLUGIN_PATH=/home/xd/Qt5.6.2/5.6/gcc_64/plugins/platforms
 
 # PCL
@@ -23,3 +23,16 @@ I had the exact same error after installing from the same source. I finally trac
 http://ceres-solver.org/installation.html
 
 # g2o
+
+# Pangolin
+//usr/lib/x86_64-linux-gnu/libsoxr.so.0: undefined reference to 'GOMP_parallel@GOMP_4.0'  
+The problem has been solved. It is due to Anaconda.  
+Delete Anaconda from $PATH and LD_LIBRARY_PATH
+
+# ORB_SLAM2
+compiling error:
+> /usr/local/lib/libopencv_calib3d.so.3.3.1: undefined reference to `GOMP_parallel@GOMP_4.0'
+
+add /usr/lib/x86_64-linux-gnu/ to $LD_LIBRARY_PATH
+But I wrong typed /lib/ into /local/
+fix it and works.

@@ -1,0 +1,2 @@
+PROJECT(hellolib)
+ADD_EXECUTABLE(lib)
