@@ -1,12 +1,9 @@
 learning
 ========
-
-my code during learning.
-
 - C
-  - [C programming language](https://book.douban.com/subject/1236999/)
-  - [C interfaces and implementations](https://book.douban.com/subject/1826292/)
-  - [Expert C programming](https://book.douban.com/subject/1784687/)
+  - C programming language
+  - C interfaces and implementations
+  - Expert C programming
 - C++
   - Accelerated C++
   - Effective C++
@@ -25,4 +22,3 @@ my code during learning.
 - Machine learning
   - Machine learning foundation
   - Nerual network for machine learning
-  - Deeplearning.ai
