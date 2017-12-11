@@ -31,6 +31,7 @@ template <class T> class Vec
             unchecked_append(val);
         }
         bool empty() const { return data == avail; }
+        void clear() { uncreate(); }
 
     private:
         iterator data;
@@ -66,13 +67,13 @@ void Vec<T>::create(size_type n, const T& val)
 {
     data = alloc.allocate(n);
     limit = avail = data + n;
-    uninitialized_fill(data, limit, val);
+    std::uninitialized_fill(data, limit, val);
 }
 template <class T>
 void Vec<T>::create(const_iterator i, const_iterator j)
 {
     data = alloc.allocate(j - i);
-    limit = avail = uninitialized_copy(i, j, data);
+    limit = avail = std::uninitialized_copy(i, j, data);
 }
 template <class T>
 void Vec<T>::uncreate()

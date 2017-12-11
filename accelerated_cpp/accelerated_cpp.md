@@ -39,4 +39,5 @@ fp get_fp();
 C++ differs from C in requiring a zero request to return a non-null pointer.  
 constructor control initialization; operator= control assignment.  
 **new** is expensive: allocate memory and initialize memory.  
+if a class supports conversion, then it is good to define binary operators as nonmember functions. e.g. x + y; compiler look only at nonmember operator+ function and operator+ function that are members of x.
 
