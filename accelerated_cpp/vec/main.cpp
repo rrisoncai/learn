@@ -1,3 +1,6 @@
+/*
+ * test Vec and Str
+ */
 #include <iostream>
 #include <memory>
 #include <vector>
@@ -24,5 +27,13 @@ int main()
     cin >> s;
     cout << "test output:" << s << endl;
     cout << "compare:" << (a1 == b1) << endl;
+
+    cout << "test c_str()" << endl;
+    char* p = a1.c_str();
+    while(*p != '\0')
+    {
+        cout << *p << "\t" << (int)(*p) << endl;;
+        p++;
+    }
     return 0;
 }

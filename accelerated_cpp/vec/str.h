@@ -21,6 +21,7 @@ class Str
         iterator end() { return data.end(); }
         const_iterator end() const { return data.end(); }
         size_type size() const { return data.size(); }
+        char* c_str();
 
         Str() { }
         Str(size_type n, char c): data(n, c) {}
@@ -85,5 +86,23 @@ bool operator==(const Str& a, const Str& b)
 bool operator!=(const Str& a, const Str& b)
 {
     return !(a == b);
+}
+char* Str::c_str()
+{
+    unsigned int str_len = (*this).size() + 1;
+
+    char* ret = ::new char[str_len];
+    char* limit = ret;
+
+    std::cout << "size of string:" << str_len << std::endl;
+    for(size_type i = 0; i != str_len; ++i)
+    {
+        *limit = (*this)[i];
+        limit++;
+    }
+    *limit= '\0';
+    std::cout << "limit:" << (int)*limit << std::endl;
+
+    return ret;
 }
 #endif
