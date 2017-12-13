@@ -25,7 +25,7 @@ int main( int argc, char** argv )
     // init tmp
     tmp.w() = 0;
     tmp.vec() = p - t1;
-    
+
     tmp = q1.inverse() * tmp * q1;
     tmp = q2 * tmp * q2.inverse();
     p2 = tmp.vec() + t2;
