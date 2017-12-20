@@ -42,4 +42,11 @@ constructor control initialization; operator= control assignment.
 if a class supports conversion, then it is good to define binary operators as nonmember functions. e.g. x + y; compiler look only at nonmember operator+ function and operator+ function that are members of x.  
 **private** members are only accessible to the class and its friends.  
 **protected** members are accessible to derived class.  
-
+construction of derived object:  
+- allocating space for the object  
+- call base-class constructor to initialize base-calss members  
+- initialize members of derived class directed by constructor initializer.  
+- execute body of derived-class constructor  
+**Virtual** function: run-time selection, when function is called through reference or pointer  
+**Dynamic binding**: function bound at run-time;**Static binding**: function bound at compiling time  
+**static member function** don't have this pointer, cannot access nonstatic class member.  
