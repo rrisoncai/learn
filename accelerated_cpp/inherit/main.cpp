@@ -1,13 +1,16 @@
-#include <iostream>
+#include <algorithm>
 #include <iomanip>
-#include "core.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include "student_info.h"
 
 using namespace std;
 
 int main()
 {
-    vector<Core> students;
-    Core record;
+    vector<Student_info> students;
+    Student_info record;
     string::size_type maxlen = 0;
 
     while(record.read(cin))
@@ -16,18 +19,17 @@ int main()
         students.push_back(record);
     }
 
-    sort(students.begin(), students.end(), compare);
+    sort(students.begin(), students.end(), Student_info::compare);
 
-    for(vector<Core>::size_type i = 0; i != students.size(); ++i)
+    for(vector<Student_info>::size_type i = 0; i != students.size(); ++i)
     {
-        cout << students[i].name() << string(maxlen + 1 - students[i].name().size(), ' ');
+        cout << students[i].name() << string(maxlen+1-students[i].name().size(), ' ');
         try
         {
             double final_grade = students[i].grade();
-            streamsize prec = cout.precision();
-            cout << setprecision(3) << final_grade << setprecision(prec) << endl;
+            cout << final_grade << endl;
         }
-        catch (domain_error e)
+        catch(domain_error e)
         {
             cout << e.what() << endl;
         }
