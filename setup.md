@@ -15,9 +15,17 @@ export LD_LIBRARY_PATH="/home/xd/Qt5.6.2/5.6/gcc_64/lib/:$LD_LIBRARY_PATH"
 export QT_PLUGIN_PATH=/home/xd/Qt5.6.2/5.6/gcc_64/plugins/platforms
 
 # PCL
-
-sudo apt-get install libpcl-dev   
+```
+sudo apt-get install libpcl-dev
+sudo apt-get install pcl-tools
+```
 I had the exact same error after installing from the same source. I finally tracked down the error to a wrong entry in the PCLConfig.cmake file. The PCL_ROOT variable there is beeing set to /usr/local, while the files were actually installed into /usr. Changing this variable resolved the problem for me.
+
+Error: /usr/bin/ld: cannot find -lvtkproj4
+solution:
+```
+list(REMOVE_ITEM PCL_IO_LIBRARIES “vtkproj4”)
+```
 
 # Ceres
 http://ceres-solver.org/installation.html
