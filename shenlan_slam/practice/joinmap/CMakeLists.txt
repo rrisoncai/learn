@@ -12,6 +12,7 @@ include_directories("/usr/include/eigen3")
 find_package(PCL REQUIRED COMPONENT common io)
 include_directories(${PCL_INCLUDE_DIRS})
 add_definitions(${PCL_DEFINITIONS})
+# fix cannot find -lvtkproj4 error
 list(REMOVE_ITEM PCL_LIBRARIES "vtkproj4")
 
 add_executable(joinMap joinMap.cpp)

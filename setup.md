@@ -24,13 +24,14 @@ I had the exact same error after installing from the same source. I finally trac
 Error: /usr/bin/ld: cannot find -lvtkproj4
 solution:
 ```
-list(REMOVE_ITEM PCL_IO_LIBRARIES “vtkproj4”)
+list(REMOVE_ITEM PCL_LIBRARIES “vtkproj4”)
 ```
 
 # Ceres
 http://ceres-solver.org/installation.html
 
 # g2o
+The latest master branch incorporates changes that are API incompatible.
 
 # Pangolin
 //usr/lib/x86_64-linux-gnu/libsoxr.so.0: undefined reference to 'GOMP_parallel@GOMP_4.0'  
