@@ -47,6 +47,14 @@ construction of derived object:
 - call base-class constructor to initialize base-calss members  
 - initialize members of derived class directed by constructor initializer.  
 - execute body of derived-class constructor  
+
 **Virtual** function: run-time selection, when function is called through reference or pointer  
 **Dynamic binding**: function bound at run-time;**Static binding**: function bound at compiling time  
-**static member function** don't have this pointer, cannot access nonstatic class member.  
+**static member function** don't have **this** pointer, cannot access nonstatic class member.Within the scope of class.  
+Pointer pitfalls:
+- copy a point != copy the pointing object  
+- destroy a pointer != destroy the pointing object  
+- delete an object without destroying a point, leads to dangling  
+- create a point without initializing leave the pointer unbound.  
+
+**template<>** is template specialization.  
