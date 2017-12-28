@@ -421,25 +421,30 @@ void computeORBDesc(const cv::Mat &image, vector<cv::KeyPoint> &keypoints, vecto
         DescType d(256, false);
         for (int i = 0; i < 256; i++) {
             // START YOUR CODE HERE (~7 lines)
-            int up = kp.pt.x + ORB_pattern[i * 4 + 0];
-            int vp = kp.pt.y + ORB_pattern[i * 4 + 1];
-            int uq = kp.pt.x + ORB_pattern[i * 4 + 2];
-            int vq = kp.pt.y + ORB_pattern[i * 4 + 3];
-
             double rad = kp.angle * pi / 180;
-            int up1 = (int)(cos(rad) * up - sin(rad) * vp);
-            int vp1 = (int)(sin(rad) * up + cos(rad) * vp);
-            int uq1 = (int)(cos(rad) * uq - sin(rad) * vq);
-            int vq1 = (int)(sin(rad) * uq + cos(rad) * vq);
+            int up = ORB_pattern[i * 4 + 0];
+            int vp = ORB_pattern[i * 4 + 1];
+            int uq = ORB_pattern[i * 4 + 2];
+            int vq = ORB_pattern[i * 4 + 3];
+
+            int upr = (int)(cos(rad) * up - sin(rad) * vp);
+            int vpr = (int)(sin(rad) * up + cos(rad) * vp);
+            int uqr = (int)(cos(rad) * uq - sin(rad) * vq);
+            int vqr = (int)(sin(rad) * uq + cos(rad) * vq);
+
+            up = kp.pt.x + upr;
+            vp = kp.pt.y + vpr;
+            uq = kp.pt.x + uqr;
+            vq = kp.pt.y + vqr;
 
             d[i] = 0;  // if kp goes outside, set d.clear()
-            if(OutOfRange(image, up1, vp1, 0) || OutOfRange(image, uq1,vq1, 0))
+            if(OutOfRange(image, up, vp, 0) || OutOfRange(image, uq,vq, 0))
             {
                 d.clear();
                 break;
             }
 
-            d[i] = image.at<uchar>(vp1, up1) > image.at<uchar>(vq1, uq1) ? 0 : 1;
+            d[i] = image.at<uchar>(vp, up) > image.at<uchar>(vq, uq) ? 0 : 1;
 	    // END YOUR CODE HERE
         }
         desc.push_back(d);
@@ -460,9 +465,9 @@ void bfMatch(const vector<DescType> &desc1, const vector<DescType> &desc2, vecto
     // START YOUR CODE HERE (~12 lines)
     // find matches between desc1 and desc2.
     cv::DMatch m;
-    m.distance = 9999;
     for(int i = 0; i != desc1.size(); ++i)
     {
+        m.distance = INT_MAX;
         for(int j = 0; j != desc2.size(); ++j)
         {
             int dist = hamming_distance(desc1[i], desc2[j]);

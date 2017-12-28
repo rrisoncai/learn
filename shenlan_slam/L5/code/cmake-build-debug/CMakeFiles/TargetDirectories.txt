@@ -1,3 +1,0 @@
-/home/xd/ws/learn/shenlan_slam/L5/code/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/xd/ws/learn/shenlan_slam/L5/code/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/xd/ws/learn/shenlan_slam/L5/code/cmake-build-debug/CMakeFiles/computeORB.dir
