@@ -183,8 +183,8 @@ void OpticalFlowSingleLevel(
                     Eigen::Vector2d J;  // Jacobian
                     if (inverse == false) {
                         // Forward Jacobian
-                        J[0] = (GetPixelValue(img2,x1+1,y1) - GetPixelValue(img2,x1-1,y1))/2;
-                        J[1] = (GetPixelValue(img2,x1,y1+1) - GetPixelValue(img2,x1,y1-1))/2;
+                        J[0] = (GetPixelValue(img2,x1+dx+1,y1+dy) - GetPixelValue(img2,x1+dx-1,y1+dy))/2;
+                        J[1] = (GetPixelValue(img2,x1+dx,y1+dy+1) - GetPixelValue(img2,x1+dx,y1+dy-1))/2;
                     } else {
                         // Inverse Jacobian
                         // NOTE this J does not change when dx, dy is updated, so we can store it and only compute error
