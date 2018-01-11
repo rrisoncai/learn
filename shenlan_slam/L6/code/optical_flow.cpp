@@ -177,25 +177,30 @@ void OpticalFlowSingleLevel(
                 for (int y = -half_patch_size; y < half_patch_size; y++) {
 
                     // TODO START YOUR CODE HERE (~8 lines)
-                    double error = 0;
+                    int x1 = kp.pt.x + x;
+                    int y1 = kp.pt.y + y;
+                    double error = (GetPixelValue(img1,x1,y1)-GetPixelValue(img2,x1+dx,y1+dy));
                     Eigen::Vector2d J;  // Jacobian
                     if (inverse == false) {
                         // Forward Jacobian
+                        J[0] = (GetPixelValue(img2,x1+1,y1) - GetPixelValue(img2,x1-1,y1))/2;
+                        J[1] = (GetPixelValue(img2,x1,y1+1) - GetPixelValue(img2,x1,y1-1))/2;
                     } else {
                         // Inverse Jacobian
                         // NOTE this J does not change when dx, dy is updated, so we can store it and only compute error
                     }
 
                     // compute H, b and set cost;
-                    H;
-                    b;
-                    cost;
+                    Eigen::Matrix<double, 1, 2> J_mat(J(0),J(1));
+                    H += J_mat.transpose() * J_mat;
+                    b += J.transpose() * error;
+                    cost += error * error;
                     // TODO END YOUR CODE HERE
                 }
 
             // compute update
             // TODO START YOUR CODE HERE (~1 lines)
-            Eigen::Vector2d update;
+            Eigen::Vector2d update = H.inverse() * b;
             // TODO END YOUR CODE HERE
 
             if (isnan(update[0])) {
