@@ -177,8 +177,8 @@ void OpticalFlowSingleLevel(
                 for (int y = -half_patch_size; y < half_patch_size; y++) {
 
                     // TODO START YOUR CODE HERE (~8 lines)
-                    int x1 = kp.pt.x + x;
-                    int y1 = kp.pt.y + y;
+                    float x1 = kp.pt.x + x;
+                    float y1 = kp.pt.y + y;
                     double error = (GetPixelValue(img1,x1,y1)-GetPixelValue(img2,x1+dx,y1+dy));
                     Eigen::Vector2d J;  // Jacobian
                     if (inverse == false) {
@@ -188,6 +188,8 @@ void OpticalFlowSingleLevel(
                     } else {
                         // Inverse Jacobian
                         // NOTE this J does not change when dx, dy is updated, so we can store it and only compute error
+                        J[0] = (GetPixelValue(img1,x1+1,y1) - GetPixelValue(img1,x1-1,y1))/2;
+                        J[1] = (GetPixelValue(img1,x1,y1+1) - GetPixelValue(img1,x1,y1-1))/2;
                     }
 
                     // compute H, b and set cost;
@@ -251,13 +253,38 @@ void OpticalFlowMultiLevel(
     vector<Mat> pyr1, pyr2; // image pyramids
     // TODO START YOUR CODE HERE (~8 lines)
     for (int i = 0; i < pyramids; i++) {
-
+        Mat dst1, dst2;
+        resize(img1, dst1, Size(), scales[i], scales[i]);
+        resize(img2, dst2, Size(), scales[i], scales[i]);
+        pyr1.push_back(dst1);
+        pyr2.push_back(dst2);
     }
     // TODO END YOUR CODE HERE
 
     // coarse-to-fine LK tracking in pyramids
     // TODO START YOUR CODE HERE
 
+    vector<KeyPoint> kp2_scale;
+    for(int i = pyramids - 1; i >= 0; ++i)
+    {
+        vector<KeyPoint> kp1_scale = kp1;
+        for(int i = 0; i != kp1_scale.size(); ++i)
+        {
+            kp1_scale[i].pt.x *= scales[i];
+            kp1_scale[i].pt.y *= scales[i];
+        }
+        OpticalFlowSingleLevel(pyr1[i], pyr2[i], kp1_scale, kp2_scale, success, inverse);
+        if(!kp2_scale.empty())
+        {
+            for(int i = 0; i != kp2_scale.size(); ++i)
+            {
+                kp2_scale[i].pt.x /= pyramid_scale;
+                kp2_scale[i].pt.y /= pyramid_scale;
+            }
+        }
+    }
+
+    kp2 = kp2_scale;
     // TODO END YOUR CODE HERE
     // don't forget to set the results into kp2
 }
