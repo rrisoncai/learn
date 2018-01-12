@@ -99,8 +99,8 @@ int main(int argc, char **argv) {
 
     for (int i = 1; i < 6; i++) {  // 1~10
         cv::Mat img = cv::imread((fmt_others % i).str(), 0);
-        // DirectPoseEstimationSingleLayer(left_img, img, pixels_ref, depth_ref, T_cur_ref);    // first you need to test single layer
-        DirectPoseEstimationMultiLayer(left_img, img, pixels_ref, depth_ref, T_cur_ref);
+        DirectPoseEstimationSingleLayer(left_img, img, pixels_ref, depth_ref, T_cur_ref);    // first you need to test single layer
+        // DirectPoseEstimationMultiLayer(left_img, img, pixels_ref, depth_ref, T_cur_ref);
     }
 }
 
@@ -133,6 +133,33 @@ void DirectPoseEstimationSingleLayer(
             // compute the projection in the second image
             // TODO START YOUR CODE HERE
             float u =0, v = 0;
+
+            // camera intrinsic matrix: K
+            Eigen::Matrix3d K;
+            double Z = depth_ref[i];
+            K << fx, 0, cx, 0, fy, cy, 0, 0, 1;
+
+            // compute world point P
+            Eigen::Vector3d P(px_ref[i](0), px_ref[i](1), 1);
+            P = K.inverse() * depth_ref[i] * P;
+
+            double x = P(0);
+            double y = P(1);
+            double z = P(2);
+            Eigen::Vector4d P4d(x,y,z,1);
+            P4d = T21.matrix()* P4d;
+            // compute img2 point P2
+            Eigen::Vector3d P2(P4d(0),P4d(1),P4d(2));
+            P2 = 1 / depth_ref[i] * K * P2;
+
+            u = P2(0);
+            v = P2(1);
+
+            if(u <= half_patch_size || u >= img2.cols - half_patch_size ||
+            v <= half_patch_size || v >= img2.rows - half_patch_size)
+            {
+                continue;
+            }
             nGood++;
             goodProjection.push_back(Eigen::Vector2d(u, v));
 
@@ -140,13 +167,27 @@ void DirectPoseEstimationSingleLayer(
             for (int x = -half_patch_size; x < half_patch_size; x++)
                 for (int y = -half_patch_size; y < half_patch_size; y++) {
 
-                    double error =0;
+                    double error = GetPixelValue(img1,px_ref[i](0),px_ref[i](1)) - GetPixelValue(img2,u,v);
 
                     Matrix26d J_pixel_xi;   // pixel to \xi in Lie algebra
+                    J_pixel_xi(0, 0) = fx / z;
+                    J_pixel_xi(0, 1) = 0;
+                    J_pixel_xi(0, 2) = -fx * x / z / z;
+                    J_pixel_xi(0, 3) = -fx * x * y / z / z;
+                    J_pixel_xi(0, 4) = fx + fx * x * x / z / z;
+                    J_pixel_xi(0, 5) = -fx * y / z;
+                    J_pixel_xi(1, 0) = 0;
+                    J_pixel_xi(1, 1) = fy / z;
+                    J_pixel_xi(1, 2) = -fy * y / z / z;
+                    J_pixel_xi(1, 3) = -fy - fy * y * y / z / z;
+                    J_pixel_xi(1, 4) = fy * x * y / z / z;
+                    J_pixel_xi(1, 5) = fy * x / z;
                     Eigen::Vector2d J_img_pixel;    // image gradients
+                    J_img_pixel(0) = (GetPixelValue(img2, u+1,v) - GetPixelValue(img2,u-1,v))/2;
+                    J_img_pixel(1) = (GetPixelValue(img2, u,v+1) - GetPixelValue(img2,u,v-1))/2;
 
                     // total jacobian
-                    Vector6d J=0;
+                    Vector6d J = J_img_pixel.transpose() * J_pixel_xi;
 
                     H += J * J.transpose();
                     b += -error * J;

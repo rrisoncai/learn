@@ -193,8 +193,7 @@ void OpticalFlowSingleLevel(
                     }
 
                     // compute H, b and set cost;
-                    Eigen::Matrix<double, 1, 2> J_mat(J(0),J(1));
-                    H += J_mat.transpose() * J_mat;
+                    H += J * J.transpose();
                     b += J.transpose() * error;
                     cost += error * error;
                     // TODO END YOUR CODE HERE
