@@ -253,34 +253,41 @@ void OpticalFlowMultiLevel(
     vector<Mat> pyr1, pyr2; // image pyramids
     // TODO START YOUR CODE HERE (~8 lines)
     for (int i = 0; i < pyramids; i++) {
-        Mat dst1, dst2;
+        Mat dst1;
+        Mat dst2;
         resize(img1, dst1, Size(), scales[i], scales[i]);
         resize(img2, dst2, Size(), scales[i], scales[i]);
-        pyr1.push_back(dst1);
-        pyr2.push_back(dst2);
+        pyr1.push_back(dst1.clone());
+        pyr2.push_back(dst2.clone());
     }
+
     // TODO END YOUR CODE HERE
 
     // coarse-to-fine LK tracking in pyramids
     // TODO START YOUR CODE HERE
 
     vector<KeyPoint> kp2_scale;
-    for(int i = pyramids - 1; i >= 0; ++i)
+    for(int i = pyramids - 1; i >= 0; --i)
     {
         vector<KeyPoint> kp1_scale = kp1;
-        for(int i = 0; i != kp1_scale.size(); ++i)
+        for(int j = 0; j != kp1_scale.size(); ++j)
         {
-            kp1_scale[i].pt.x *= scales[i];
-            kp1_scale[i].pt.y *= scales[i];
+            kp1_scale[j].pt.x *= scales[i];
+            kp1_scale[j].pt.y *= scales[i];
         }
-        OpticalFlowSingleLevel(pyr1[i], pyr2[i], kp1_scale, kp2_scale, success, inverse);
-        if(!kp2_scale.empty())
+
+        for(int j = 0; j != kp2_scale.size(); ++j)
         {
-            for(int i = 0; i != kp2_scale.size(); ++i)
-            {
-                kp2_scale[i].pt.x /= pyramid_scale;
-                kp2_scale[i].pt.y /= pyramid_scale;
-            }
+            kp2_scale[j].pt.x *= scales[i];
+            kp2_scale[j].pt.y *= scales[i];
+        }
+
+        OpticalFlowSingleLevel(pyr1[i], pyr2[i], kp1_scale, kp2_scale, success, inverse);
+
+        for(int j = 0; j != kp2_scale.size(); ++j)
+        {
+            kp2_scale[j].pt.x /= scales[i];
+            kp2_scale[j].pt.y /= scales[i];
         }
     }
 
