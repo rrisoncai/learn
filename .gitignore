@@ -218,6 +218,5 @@ pip-log.txt
 *.out
 
 # Clion
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-/cmake-build-*/
+.idea/
+cmake-build-*/
