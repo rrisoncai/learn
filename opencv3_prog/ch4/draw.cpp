@@ -44,6 +44,35 @@ void DrawFilledCircle(Mat img, Point center)
 
 int main()
 {
+    // 7 ways of Mat init
+    double time0 = static_cast<double>(getTickCount());
+    Mat M(2,2,CV_8UC3,Scalar(0,0,255));
+    cout << "M=" << endl << " " << M << endl << endl;
+
+    Mat L;
+    L.create(4,4,CV_8UC(2));
+    cout << "L=" << endl << " " << L << endl << endl;
+
+    Mat E = Mat::eye(4,4,CV_64F);
+    cout << "E=" << endl << E << endl << endl;
+    Mat O = Mat::ones(2,2,CV_32F);
+    cout << "O=" << endl << O << endl << endl;
+    Mat Z = Mat::zeros(3,3,CV_8UC1);
+    cout << "Z=" << endl << Z << endl << endl;
+
+    Mat C = (Mat_<double>(3,3) << 0,-1,0,-1,5,-1,0,-1,0);
+    cout << "C=" << endl << C << endl << endl;
+    Mat R = C.row(1).clone();
+    cout << "R=" << endl << R << endl << endl;
+
+    Mat r = Mat(10,3,CV_8UC3);
+    randu(r,Scalar::all(0),Scalar::all(255));
+    cout << "r=" << format(r,Formatter::FMT_PYTHON) << endl << endl;
+    
+    time0 = ((double)getTickCount() - time0) / getTickFrequency();
+    cout << "running time:" << time0 << endl;
+
+    return 0;
     Mat atomImage = Mat::zeros(WINDOW_WIDTH, WINDOW_WIDTH, CV_8UC3);
     Mat rookImage = Mat::zeros(WINDOW_WIDTH, WINDOW_WIDTH, CV_8UC3);
 

@@ -9,3 +9,6 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 
 add_executable(draw draw.cpp)
 target_link_libraries(draw ${OpenCV_LIBS})
+
+add_executable(access access.cpp)
+target_link_libraries(access ${OpenCV_LIBS})
