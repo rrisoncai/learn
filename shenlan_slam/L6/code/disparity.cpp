@@ -17,6 +17,7 @@ string disparity_file = "./disparity.png";
 double fx = 718.856, fy = 718.856, cx = 607.1928, cy = 185.2157;
 // 基线
 double baseline = 0.573;
+
 // TODO implement this funciton
 /**
  * single level optical flow
@@ -79,21 +80,22 @@ inline float GetPixelValue(const cv::Mat &img, float x, float y) {
 int main(int argc, char **argv) {
 
     // images, note they are CV_8UC1, not CV_8UC3
-    Mat left_img = imread(left_file, 0);
-    Mat right_img = imread(right_file, 0);
+    Mat img1 = imread(left_file, 0);
+    Mat img2 = imread(right_file, 0);
     Mat disparity_img = imread(disparity_file, 0);
 
     // key points, using GFTT here.
-    vector<KeyPoint> left_kp;
+    vector<KeyPoint> kp1;
     Ptr<GFTTDetector> detector = GFTTDetector::create(500, 0.01, 20); // maximum 500 keypoints
-    detector->detect(left_img, left_kp);
+    detector->detect(img1, kp1);
+
     vector<double> depth_ref;
     vector<double> depth_est;
 
-    for(int i = 0; i != left_kp.size(); ++i)
+    for(int i = 0; i != kp1.size(); ++i)
     {
-        int x = left_kp[i].pt.x;
-        int y = left_kp[i].pt.y;
+        int x = kp1[i].pt.x;
+        int y = kp1[i].pt.y;
 
         int disparity = disparity_img.at<uchar>(y,x);
         double depth = disparity;
@@ -101,46 +103,25 @@ int main(int argc, char **argv) {
     }
 
     // then test multi-level LK
-    vector<KeyPoint> right_kp;
-    vector<bool> right_success;
-    OpticalFlowMultiLevel(left_img, right_img, left_kp, right_kp, right_success, true);
+    vector<KeyPoint> kp2_multi;
+    vector<bool> success_multi;
+    OpticalFlowMultiLevel(img1, img2, kp1, kp2_multi, success_multi, true);
 
     // plot the differences of those functions
-    Mat left_kp_img;
-    cv::cvtColor(left_img, left_kp_img, CV_GRAY2BGR);
-    for (int i = 0; i < left_kp.size(); i++) {
-            cv::circle(left_kp_img, left_kp[i].pt, 2, cv::Scalar(0, 250, 0), 2);
-    }
-
-
-    Mat right_kp_img;
-    cv::cvtColor(right_img, right_kp_img, CV_GRAY2BGR);
-    for (int i = 0; i < right_kp.size(); i++) {
-        if (right_success[i]) {
-            cv::circle(right_kp_img, right_kp[i].pt, 2, cv::Scalar(0, 250, 0), 2);
+    Mat img2_multi;
+    cv::cvtColor(img2, img2_multi, CV_GRAY2BGR);
+    for (int i = 0; i < kp2_multi.size(); i++) {
+        if (success_multi[i]) {
+            cv::circle(img2_multi, kp2_multi[i].pt, 2, cv::Scalar(0, 250, 0), 2);
+            cv::line(img2_multi, kp1[i].pt, kp2_multi[i].pt, cv::Scalar(0, 250, 0));
         }
     }
-
-
-    Mat vconcat_img;
-    cv::vconcat(left_kp_img, right_kp_img, vconcat_img);
-    for(int i = 0; i  < right_kp.size(); ++i)
-    {
-        if(right_success[i])
-        {
-            Point2f p(right_kp[i].pt.x, right_kp[i].pt.y + left_img.rows);
-            cv::line(vconcat_img, left_kp[i].pt, p,cv::Scalar(0,0,255));
-        }
-    }
-    cv::imshow("top:left;bottom:right", vconcat_img);
-    waitKey(0);
-
 
     // calculate disparity error
-    for(int i = 0; i != left_kp.size(); ++i)
+    for(int i = 0; i != kp2_multi.size(); ++i)
     {
         double depth;
-        depth = abs(left_kp[i].pt.x - right_kp[i].pt.x);
+        depth = abs(kp1[i].pt.x - kp2_multi[i].pt.x);
         depth_est.push_back(depth);
     }
 
@@ -148,7 +129,7 @@ int main(int argc, char **argv) {
     int count = 0;
     for(int i = 0; i != depth_ref.size(); ++i)
     {
-        if(right_success[i])
+        if(success_multi[i])
         {
             depth_error += abs(fx * baseline / depth_est[i] - fx * baseline / depth_ref[i]);
             count++;
@@ -156,6 +137,10 @@ int main(int argc, char **argv) {
     }
     depth_error /= count;
     cout << "average depth error:" << depth_error << endl;
+
+    cv::imshow("tracked multi level", img2_multi);
+    cv::waitKey(0);
+
     return 0;
 }
 
@@ -169,8 +154,8 @@ void OpticalFlowSingleLevel(
 ) {
 
     // parameters
-    int half_patch_size = 4;
-    int iterations = 10;
+    int half_patch_size = 8;
+    int iterations = 100;
     bool have_initial = !kp2.empty();
 
     for (size_t i = 0; i < kp1.size(); i++) {

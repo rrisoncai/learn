@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
     // first use single level LK in the validation picture
     vector<KeyPoint> kp2_single;
     vector<bool> success_single;
-    OpticalFlowSingleLevel(img1, img2, kp1, kp2_single, success_single);
+    OpticalFlowSingleLevel(img1, img2, kp1, kp2_single, success_single, true);
 
     // then test multi-level LK
     vector<KeyPoint> kp2_multi;
