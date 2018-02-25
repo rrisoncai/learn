@@ -12,3 +12,6 @@ target_link_libraries(draw ${OpenCV_LIBS})
 
 add_executable(access access.cpp)
 target_link_libraries(access ${OpenCV_LIBS})
+
+add_executable(dft dft.cpp)
+target_link_libraries(dft ${OpenCV_LIBS})
