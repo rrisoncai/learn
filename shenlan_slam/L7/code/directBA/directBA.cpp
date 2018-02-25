@@ -17,13 +17,13 @@ using namespace std;
 #include <g2o/types/sba/types_six_dof_expmap.h>
 
 #include <Eigen/Core>
-#include <sophus/se3.h>
+#include <sophus/se3.hpp>
 #include <opencv2/opencv.hpp>
 
 #include <pangolin/pangolin.h>
 #include <boost/format.hpp>
 
-typedef vector<Sophus::SE3, Eigen::aligned_allocator<Sophus::SE3>> VecSE3;
+typedef vector<Sophus::SE3d, Eigen::aligned_allocator<Sophus::SE3d>> VecSE3;
 typedef vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> VecVec3d;
 
 // global variables
@@ -50,7 +50,7 @@ inline float GetPixelValue(const cv::Mat &img, float x, float y) {
 }
 
 // g2o vertex that use sophus::SE3 as pose
-class VertexSophus : public g2o::BaseVertex<6, Sophus::SE3> {
+class VertexSophus : public g2o::BaseVertex<6, Sophus::SE3d> {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -58,23 +58,23 @@ public:
 
     ~VertexSophus() {}
 
-    bool read(std::istream &is) {}
+    bool read(std::istream &is) {return false;}
 
-    bool write(std::ostream &os) const {}
+    bool write(std::ostream &os) const {return false;}
 
     virtual void setToOriginImpl() {
-        _estimate = Sophus::SE3();
+        _estimate = Sophus::SE3d();
     }
 
     virtual void oplusImpl(const double *update_) {
         Eigen::Map<const Eigen::Matrix<double, 6, 1>> update(update_);
-        setEstimate(Sophus::SE3::exp(update) * estimate());
+        setEstimate(Sophus::SE3d::exp(update) * estimate());
     }
 };
 
 // TODO edge of projection error, implement it
 // 16x1 error, which is the errors in patch
-typedef Eigen::Matrix<double,16,1> Vector16d;
+typedef Eigen::Matrix<float,16,1> Vector16d;
 class EdgeDirectProjection : public g2o::BaseBinaryEdge<16, Vector16d, g2o::VertexSBAPointXYZ, VertexSophus> {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
@@ -89,14 +89,30 @@ public:
     virtual void computeError() override {
         // TODO START YOUR CODE HERE
         // compute projection error ...
+        g2o::VertexSBAPointXYZ* point = static_cast<g2o::VertexSBAPointXYZ*>(_vertices[0]);
+        VertexSophus* pose = static_cast<VertexSophus*>(_vertices[1]);
+        Sophus::SE3d se3 = pose->estimate();
+        Eigen::Vector3d p = point->estimate();
+        Eigen::Vector3d pt = se3 * p;
+
+        float u = pt(0) / pt(2) * fx + cx;
+        float v = pt(1) / pt(2) * fy + cy;
+        int i = 0;
+        for(int c = -2; c < 2; ++c) {
+            for(int r = -2; r < 2; ++r) {
+                float intensity = GetPixelValue(this->targetImg, u+c, v+r);
+                _error(i,0) = this->origColor[i] - intensity;
+                i++;
+            }
+        }
         // END YOUR CODE HERE
     }
 
     // Let g2o compute jacobian for you
 
-    virtual bool read(istream &in) {}
+    virtual bool read(istream &in) override {return false;}
 
-    virtual bool write(ostream &out) const {}
+    virtual bool write(ostream &out) const override {return false;}
 
 private:
     cv::Mat targetImg;  // the target image
@@ -119,7 +135,7 @@ int main(int argc, char **argv) {
         if (timestamp == 0) break;
         double data[7];
         for (auto &d: data) fin >> d;
-        poses.push_back(Sophus::SE3(
+        poses.push_back(Sophus::SE3d(
                 Eigen::Quaterniond(data[6], data[3], data[4], data[5]),
                 Eigen::Vector3d(data[0], data[1], data[2])
         ));
@@ -164,14 +180,73 @@ int main(int argc, char **argv) {
     // TODO add vertices, edges into the graph optimizer
     // START YOUR CODE HERE
 
+    // add pose vertex
+    for(int i = 0; i < poses.size(); ++i) {
+        VertexSophus* v = new VertexSophus();
+        v->setId(i);
+        v->setEstimate(poses[i]);
+        optimizer.addVertex(v);
+    }
+    // add point Vertex
+    for(int i = 0; i < points.size(); ++i) {
+        double x = points[i][0];
+        double y = points[i][1];
+        double z = points[i][2];
+
+        g2o::VertexSBAPointXYZ* v = new g2o::VertexSBAPointXYZ();
+        v->setId(poses.size() + i);
+        v->setMarginalized(true);
+        v->setEstimate(Eigen::Vector3d(x,y,z));
+        optimizer.addVertex(v);
+    }
+    // add edges
+    vector<EdgeDirectProjection*>edges;
+    for(int i = 0; i < poses.size(); ++i) {
+        for(int j = 0; j < points.size(); ++j) {
+
+            g2o::VertexSBAPointXYZ* vp = static_cast< g2o::VertexSBAPointXYZ*>(optimizer.vertex(poses.size() + j));
+            VertexSophus* vse = static_cast<VertexSophus*>(optimizer.vertex(i));
+
+            Sophus::SE3d se3 = vse->estimate();
+            Eigen::Vector3d p = vp->estimate();
+            Eigen::Vector3d pt = se3 * p;
+            float u = pt(0) / pt(2) * fx + cx;
+            float v = pt(1) / pt(2) * fy + cy;
+
+            if(u-2 < 0 || u+1 >= 640 || v-2 < 0 || v+1 >= 480) {
+                continue;
+            }
+
+            EdgeDirectProjection* edge = new EdgeDirectProjection(color[i], images[i]);
+            edge->setVertex(0, vp);
+            edge->setVertex(1, vse);
+            edge->setInformation(Eigen::Matrix<double,16,16>::Identity());
+            g2o::RobustKernelHuber* rk = new g2o::RobustKernelHuber;
+            rk->setDelta(0.5);
+            edge->setRobustKernel(rk);
+            optimizer.addEdge(edge);
+            edges.push_back(edge);
+        }
+    }
+    cout << "num of edges: " << edges.size() << endl;
+
     // END YOUR CODE HERE
 
     // perform optimization
+    optimizer.setVerbose(true);
     optimizer.initializeOptimization(0);
     optimizer.optimize(200);
 
     // TODO fetch data from the optimizer
     // START YOUR CODE HERE
+    for(int i = 0; i < poses.size(); ++i) {
+        VertexSophus* vse = static_cast<VertexSophus*>(optimizer.vertex(i));
+        poses[i] = vse->estimate();
+    }
+    for(int i = 0; i < points.size(); ++i) {
+        g2o::VertexSBAPointXYZ* vp = static_cast< g2o::VertexSBAPointXYZ*>(optimizer.vertex(poses.size() + i));
+        points[i] = vp->estimate();
+    }
     // END YOUR CODE HERE
 
     // plot the optimized points and poses
@@ -253,4 +328,3 @@ void Draw(const VecSE3 &poses, const VecVec3d &points) {
         usleep(5000);   // sleep 5 ms
     }
 }
-
