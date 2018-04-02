@@ -13,12 +13,14 @@ learning
 - Python
   - Python核心编程
 - SLAM
-  - SLAM十四讲
-  - OPENCV3.1
-  - 深蓝学院SLAM
+  - ~~SLAM十四讲~~
+  - ~~OPENCV3.1~~
+  - ~~深蓝学院SLAM~~
 - Math
   - linear algebra
   - digital signal processing
+  - Matrix analysis
 - Machine learning
   - Machine learning foundation
   - Nerual network for machine learning
+  - Deeplearning.ai
