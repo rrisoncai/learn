@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <unistd.h>
 
 // need pangolin for plotting trajectory
 #include <pangolin/pangolin.h>

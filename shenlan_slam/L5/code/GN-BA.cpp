@@ -17,7 +17,7 @@ using namespace Eigen;
 using namespace std;
 
 typedef vector<Vector3d, Eigen::aligned_allocator<Vector3d>> VecVector3d;
-typedef vector<Vector2d, Eigen::aligned_allocator<Vector3d>> VecVector2d;
+typedef vector<Vector2d, Eigen::aligned_allocator<Vector2d>> VecVector2d;
 typedef Matrix<double, 6, 1> Vector6d;
 
 string p3d_file = "./p3d.txt";

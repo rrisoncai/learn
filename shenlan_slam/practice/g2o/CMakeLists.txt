@@ -11,6 +11,4 @@ find_package(OpenCV REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Cholmod)
 
-include_
-
 add_executable(g2o main.cpp)

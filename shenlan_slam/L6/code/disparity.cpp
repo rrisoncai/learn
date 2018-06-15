@@ -79,9 +79,13 @@ inline float GetPixelValue(const cv::Mat &img, float x, float y) {
 
 int main(int argc, char **argv) {
 
+    if(argc != 3) {
+        cout << "usage: disparity img1 img2." << endl;
+        return 1;
+    }
     // images, note they are CV_8UC1, not CV_8UC3
-    Mat img1 = imread(left_file, 0);
-    Mat img2 = imread(right_file, 0);
+    Mat img1 = imread(argv[1], 0);
+    Mat img2 = imread(argv[2], 0);
     Mat disparity_img = imread(disparity_file, 0);
 
     // key points, using GFTT here.
