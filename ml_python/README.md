@@ -6,6 +6,7 @@ mkdir -p $ML_PATH
 pip3 --version
 pip3 install --upgrade pip
 pip3 install --user --upgrdade virtualenv
+pip3 freeze # Output installed packages in requirements format.
 
 # setup virtualenv
 cd $ML_PATH
@@ -15,7 +16,3 @@ virtualenv env
 cd $ML_PATH
 source env/bin/activate
 ```
-# repository for machine learning in python
-- perceptron
-- knn
-- logistic regression
