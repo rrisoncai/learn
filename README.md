@@ -1,11 +1,11 @@
 learning
 ========
 - C
-  - C programming language
+  - ~~C programming language~~
   - C interfaces and implementations
   - Expert C programming
 - C++
-  - Accelerated C++
+  - ~~Accelerated C++~~
   - Effective C++
   - More effective C++
   - Exceptional C++
