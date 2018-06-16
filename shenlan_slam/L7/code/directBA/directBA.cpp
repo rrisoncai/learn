@@ -17,13 +17,13 @@ using namespace std;
 #include <g2o/types/sba/types_six_dof_expmap.h>
 
 #include <Eigen/Core>
-#include <sophus/se3.hpp>
+#include <sophus/se3.h>
 #include <opencv2/opencv.hpp>
 
 #include <pangolin/pangolin.h>
 #include <boost/format.hpp>
 
-typedef vector<Sophus::SE3d, Eigen::aligned_allocator<Sophus::SE3d>> VecSE3;
+typedef vector<Sophus::SE3, Eigen::aligned_allocator<Sophus::SE3>> VecSE3;
 typedef vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d>> VecVec3d;
 
 // global variables
@@ -50,7 +50,7 @@ inline float GetPixelValue(const cv::Mat &img, float x, float y) {
 }
 
 // g2o vertex that use sophus::SE3 as pose
-class VertexSophus : public g2o::BaseVertex<6, Sophus::SE3d> {
+class VertexSophus : public g2o::BaseVertex<6, Sophus::SE3> {
 public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
@@ -63,12 +63,12 @@ public:
     bool write(std::ostream &os) const {return false;}
 
     virtual void setToOriginImpl() {
-        _estimate = Sophus::SE3d();
+        _estimate = Sophus::SE3();
     }
 
     virtual void oplusImpl(const double *update_) {
         Eigen::Map<const Eigen::Matrix<double, 6, 1>> update(update_);
-        setEstimate(Sophus::SE3d::exp(update) * estimate());
+        setEstimate(Sophus::SE3::exp(update) * estimate());
     }
 };
 
@@ -91,7 +91,7 @@ public:
         // compute projection error ...
         g2o::VertexSBAPointXYZ* point = static_cast<g2o::VertexSBAPointXYZ*>(_vertices[0]);
         VertexSophus* pose = static_cast<VertexSophus*>(_vertices[1]);
-        Sophus::SE3d se3 = pose->estimate();
+        Sophus::SE3 se3 = pose->estimate();
         Eigen::Vector3d p = point->estimate();
         Eigen::Vector3d pt = se3 * p;
 
@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
         if (timestamp == 0) break;
         double data[7];
         for (auto &d: data) fin >> d;
-        poses.push_back(Sophus::SE3d(
+        poses.push_back(Sophus::SE3(
                 Eigen::Quaterniond(data[6], data[3], data[4], data[5]),
                 Eigen::Vector3d(data[0], data[1], data[2])
         ));
@@ -207,7 +207,7 @@ int main(int argc, char **argv) {
             g2o::VertexSBAPointXYZ* vp = static_cast< g2o::VertexSBAPointXYZ*>(optimizer.vertex(poses.size() + j));
             VertexSophus* vse = static_cast<VertexSophus*>(optimizer.vertex(i));
 
-            Sophus::SE3d se3 = vse->estimate();
+            Sophus::SE3 se3 = vse->estimate();
             Eigen::Vector3d p = vp->estimate();
             Eigen::Vector3d pt = se3 * p;
             float u = pt(0) / pt(2) * fx + cx;
