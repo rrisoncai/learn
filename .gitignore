@@ -223,3 +223,6 @@ cmake-build-*/
 
 # mat files
 *.mat
+
+# ipnb checkpoint
+.ipynb_checkpoints/
