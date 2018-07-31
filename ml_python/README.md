@@ -16,3 +16,7 @@ virtualenv env
 cd $ML_PATH
 source env/bin/activate
 ```
+
+# tips
+- ReLU suffers from a problem known as the dying ReLUs. To solve this, use *leaky* ReLU.
+- The inverse of **to_categorical** is **np.argmax**
