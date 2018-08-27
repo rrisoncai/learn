@@ -4,6 +4,8 @@ cmake   -D CMAKE_BUILD_TYPE=RELEASE   -D CMAKE_INSTALL_PREFIX=/usr/local  -D BUI
 make -j8  
 sudo make make install  
 
+# python
+pip install scrapy -i https://pypi.tuna.tsinghua.edu.cn/simple
 # QT
 ## Download
 wget http://mirrors.ustc.edu.cn/qtproject/archive/qt/5.6/5.6.2/qt-opensource-linux-x64-5.6.2.run
