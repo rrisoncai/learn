@@ -5,9 +5,9 @@ import mnist_inference
 import numpy as np
 
 BATCH_SIZE = 100
-LEARNING_RATE_BASE = 0.8
+LEARNING_RATE_BASE = 0.01
 LEARNING_RATE_DECAY = 0.99
-REGULARIZATION_RATE = 0.001
+REGULARIZATION_RATE = 0.0001
 TRAINING_STEPS = 30000
 MOVING_AVERAGE_DECAY = 0.99
 MODEL_SAVE_PATH = 'model/'
@@ -31,7 +31,6 @@ def train(mnist):
     variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
     variable_averages_op = variable_averages.apply(tf.trainable_variables())
 
-    # cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, tf.argmax(y_, 1))
     cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=y, labels=tf.argmax(y_, 1))
     cross_entropy_mean = tf.reduce_mean(cross_entropy)
     loss = cross_entropy_mean + tf.add_n(tf.get_collection('losses')) 
@@ -43,7 +42,8 @@ def train(mnist):
 
     saver = tf.train.Saver()
     with tf.Session() as sess:
-        tf.initialize_all_variables().run()
+        # tf.initialize_all_variables().run()
+        tf.global_variables_initializer().run()
 
         for i in range(TRAINING_STEPS):
             xs, ys = mnist.train.next_batch(BATCH_SIZE)

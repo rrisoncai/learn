@@ -15,7 +15,6 @@ CONV2_DEEP = 64
 CONV2_SIZE = 5
 FC_SIZE = 512
 
-
 def get_weight_variable(shape, regularizer):
     weights = tf.get_variable('weights', shape, initializer=tf.truncated_normal_initializer(stddev=0.1))
     if regularizer != None:
