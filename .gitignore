@@ -228,3 +228,6 @@ cmake-build-*/
 # ipnb checkpoint
 .ipynb_checkpoints/
 tf_logs/
+
+# vscode
+.vscode/
