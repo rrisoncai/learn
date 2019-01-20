@@ -231,3 +231,7 @@ tf_logs/
 
 # vscode
 .vscode/
+
+# tensorflow_playground
+tensorflow_playground/datasets
+tensorflow_playground/model
