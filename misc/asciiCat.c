@@ -7,7 +7,7 @@ int main()
 {
     int num_space;
     num_space = 5;
-    char words[100] = "good day, commander";
+    char words[100] = "Good day, Commander";
     //printf("\n\n\n");
     printf("<%s>\n", words);
     printf("         |\\_/|\n");
