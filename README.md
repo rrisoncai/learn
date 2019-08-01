@@ -25,3 +25,4 @@ learning
   - Nerual network for machine learning
   - Deeplearning.ai
   - Hands-on Machine Learning with Scikit-learn and Tensorflow
+  - Misc
